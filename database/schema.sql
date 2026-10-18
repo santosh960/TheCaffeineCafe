@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS products (
   id TEXT PRIMARY KEY,
   category_id TEXT REFERENCES categories(id) ON DELETE SET NULL,
-  name TEXT NOT NULL,
+  name TEXT NOT NULL UNIQUE,
   description TEXT,
   price REAL CHECK (price IS NULL OR price >= 0),
   photo_url TEXT,

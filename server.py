@@ -44,7 +44,7 @@ def init_db():
             db.execute("INSERT OR IGNORE INTO categories(id,name,sort_order,is_active,created_at) VALUES(?,?,?,?,?)",(str(uuid.uuid4()),name,i,1,now))
         cat={r["name"]:r["id"] for r in db.execute("SELECT id,name FROM categories")}
         for name,price,category in MENU:
-            db.execute("INSERT OR IGNORE INTO products(id,category_id,name,price,is_available,is_published,status,created_at,updated_at) VALUES(?,?,?,?,1,1,'published',?,?)",(str(uuid.uuid4()),cat[category],name,price,now,now))
+            db.execute("INSERT INTO products(id,category_id,name,price,is_available,is_published,status,created_at,updated_at) SELECT ?,?,?,?,1,1,'published',?,? WHERE NOT EXISTS (SELECT 1 FROM products WHERE name=?)",(str(uuid.uuid4()),cat[category],name,price,now,now,name))
         if not db.execute("SELECT 1 FROM business_settings WHERE id=1").fetchone():
             cols=", ".join(DEFAULT_SETTINGS)
             vals=", ".join("?" for _ in DEFAULT_SETTINGS)
