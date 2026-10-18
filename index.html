@@ -1,21 +1,35 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f8f6f1" />
-    <meta name="description" content="A cozy neighborhood cafe in Karve Nagar, Pune. Discover The Caffeine Craft Cafe and browse our menu." />
-    <meta property="og:title" content="The Caffeine Craft Cafe | TCC Karve Nagar" />
-    <meta property="og:description" content="Good coffee, easy moments. Visit our cozy neighborhood cafe in Karve Nagar, Pune." />
-    <meta property="og:type" content="website" />
-    <title>The Caffeine Craft Cafe | TCC Karve Nagar</title>
-    <link rel="preconnect" href="https://images.unsplash.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f6f1">
+  <meta name="description" content="The Caffeine Craft Cafe — coffee, good company, and easy moments in Karve Nagar, Pune.">
+  <title>The Caffeine Craft Cafe · Karve Nagar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="announcement">A LITTLE CUP OF COMFORT IN <span aria-hidden="true">⌖</span> KARVE NAGAR · PUNE, INDIA</div>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#home" aria-label="The Caffeine Craft Cafe home"><img src="/images/brand/caffeine-craft-emblem.jpg" alt=""><span><b>The Caffeine Craft</b><small>CAFE · KARVE NAGAR</small></span></a>
+      <button id="nav-toggle" class="icon-button mobile-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <nav id="main-nav" aria-label="Main navigation"><a href="#home">Home</a><a href="#menu">Menu</a><a href="#about">Our story</a><a href="#contact">Visit us</a><a href="#track">Track order</a></nav>
+      <div class="header-actions"><button id="cart-open" class="icon-button" aria-label="Open shopping bag">♧ <span id="cart-count" class="cart-count">0</span></button><a class="button button-green explore" href="#menu">Explore menu ↗</a></div>
+    </div>
+    <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile navigation"><a href="#home">Home</a><a href="#menu">Menu</a><a href="#about">Our story</a><a href="#contact">Visit us</a><a href="#track">Track order</a></nav>
+  </header>
+  <main id="app" aria-live="polite"><div class="container loading">Brewing the page…</div></main>
+  <footer class="site-footer"><div class="container footer-grid">
+    <div><a class="brand footer-brand" href="#home"><img src="/images/brand/caffeine-craft-emblem.jpg" alt=""><span><b>The Caffeine Craft</b><small>CAFE · KARVE NAGAR</small></span></a><p>A cozy little corner for coffee, good company, and easy moments.</p></div>
+    <div><h3>Explore</h3><a href="#menu">Our menu</a><a href="#about">Our story</a><a href="#contact">Visit us</a><a href="#track">Track order</a></div>
+    <div><h3>Find us</h3><p>Karve Nagar, Pune</p><a target="_blank" rel="noreferrer" href="https://maps.app.goo.gl/zFnxV4gTUVLnLFFS8">Open exact map pin ↗</a></div>
+    <div><h3>Come on over</h3><p id="footer-hours">11:00 AM – 11:30 PM</p><a id="footer-phone" href="tel:+917774963125">077749 63125</a></div>
+  </div><div class="footer-bottom">© <span id="year"></span> The Caffeine Craft Cafe · TCC Karve Nagar <span>Made with a little extra care in Pune</span></div></footer>
+  <div id="modal-root"></div><div id="toast" role="status" class="toast"></div>
+</body>
 </html>
