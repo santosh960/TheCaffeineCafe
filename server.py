@@ -29,6 +29,15 @@ MENU = [
     ("Americano Black Coffee",80,"Hot Beverages"),("Cappuccino",90,"Hot Beverages"),("Latte",90,"Hot Beverages"),("Mocha",110,"Hot Beverages"),("Irish Coffee",120,"Hot Beverages"),("Vanilla Cappuccino",120,"Hot Beverages"),("Hazelnut Cappuccino",120,"Hot Beverages"),("Rose Cappuccino",120,"Hot Beverages"),("Hazelnut Latte",120,"Hot Beverages"),("Vanilla Latte",120,"Hot Beverages"),("Nutella Latte",120,"Hot Beverages"),("Biscoff Latte",120,"Hot Beverages"),("Plain Hot Chocolate",110,"Hot Beverages"),("Oreo Hot Chocolate",120,"Hot Beverages"),("Coconut Hot Chocolate",140,"Hot Beverages"),("Caramel Hot Chocolate",140,"Hot Beverages"),("Roasted Hazelnut Hot Chocolate",140,"Hot Beverages"),("Nutella Hot Chocolate",140,"Hot Beverages"),
 ]
 DEFAULT_SETTINGS = {"business_name":"The Caffeine Craft Cafe","address":"Prosperity Society, Gulab Vihar, near Vitthal Mandir Road, Ganesh Nagar, Karvenagar, Pune, Maharashtra 411052","phone":"077749 63125","opening_hours":"11:00 AM – 11:30 PM","pickup_enabled":False,"delivery_enabled":False,"delivery_fee":0,"tax_rate":0,"promotion_code":None,"promotion_description":None,"promotion_percent":0,"rating_reference":4.9,"review_count_reference":203,"rating_verified":False}
+DEFAULT_CONTENT = {
+    "brand_name":"The Caffeine Craft","brand_tagline":"CAFE · KARVE NAGAR","brand_logo":"/images/brand/caffeine-craft-emblem.jpg",
+    "hero_kicker":"YOUR NEIGHBOURHOOD COFFEE CORNER","hero_title_main":"Good coffee.","hero_title_accent":"Easy moments.","hero_description":"A cozy little corner in Karve Nagar for slow sips, familiar faces, and the kind of coffee break that feels like yours.","hero_image":"https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1800&q=85","hero_stamp":"Make room for a little me-time",
+    "menu_section_kicker":"A little something for everyone","menu_section_title":"Find your happy place.","menu_section_description":"Browse our menu favourites. Final prices and availability are confirmed by the cafe before ordering is enabled.",
+    "story_kicker":"Small cafe, big comfort","story_title":"The best plans start with a pause.","story_description":"We believe a neighborhood cafe should feel easy: warm cups, unhurried conversations, and a familiar spot to come back to.","story_image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1100&q=80",
+    "gallery_kicker":"A few snapshots","gallery_title":"Take a little look around.","gallery_description":"Warm light, a good cup, and room to settle in.","gallery_image_1":"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80","gallery_image_2":"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=900&q=80","gallery_image_3":"https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=900&q=80","gallery_image_4":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1100&q=80",
+    "about_title_main":"A neighborhood","about_title_accent":"kind of coffee.","about_paragraph_1":"The Caffeine Craft Cafe is a cozy neighborhood cafe in Karve Nagar, Pune. A friendly place to pause, catch up, and enjoy a cup at your own pace.","about_paragraph_2":"We’re building a space where everyday moments feel a little more special. Come by, say hello, and make yourself at home.","about_note":"Our menu and cafe details are being updated with the owner. We’ll share confirmed information here as it becomes available.","about_image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1100&q=80",
+    "contact_title":"Find your way here.","contact_description":"Your neighborhood coffee corner, right here in Karve Nagar.","map_embed_url":"https://www.google.com/maps?q=The+Caffeine+Craft+Cafe,+Karve+Nagar,+Pune&t=k&z=17&output=embed","map_link_url":"https://maps.app.goo.gl/zFnxV4gTUVLnLFFS8","footer_description":"A cozy little corner for coffee, good company, and easy moments."
+}
 
 def connect():
     db = sqlite3.connect(DB_PATH)
@@ -39,6 +48,8 @@ def connect():
 def init_db():
     with connect() as db:
         db.executescript((ROOT / "database" / "schema.sql").read_text())
+        for key,value in DEFAULT_CONTENT.items():
+            db.execute("INSERT OR IGNORE INTO site_content(content_key,content_value) VALUES(?,?)",(key,value))
         now=iso_now()
         for i,name in enumerate(("Cold Beverages","Milkshakes","Hot Beverages"),1):
             db.execute("INSERT OR IGNORE INTO categories(id,name,sort_order,is_active,created_at) VALUES(?,?,?,?,?)",(str(uuid.uuid4()),name,i,1,now))
@@ -57,6 +68,10 @@ def bools(row, keys):
         if key in value: value[key]=bool(value[key])
     return value
 def settings_row(db): return bools(db.execute("SELECT * FROM business_settings WHERE id=1").fetchone(),("pickup_enabled","delivery_enabled","rating_verified"))
+def content_rows(db):
+    values=DEFAULT_CONTENT.copy()
+    values.update({r["content_key"]:r["content_value"] for r in db.execute("SELECT content_key,content_value FROM site_content")})
+    return values
 def public_product(row):
     item=dict(row)
     import json
@@ -88,7 +103,7 @@ def public_data():
     with connect() as db:
         products=[public_product(r) for r in db.execute("SELECT * FROM products WHERE is_published=1 AND is_available=1 AND price IS NOT NULL ORDER BY name")]
         categories=[dict(r) for r in db.execute("SELECT id,name,sort_order FROM categories WHERE is_active=1 ORDER BY sort_order")]
-        return jsonify(products=products,categories=categories,settings=settings_row(db))
+        return jsonify(products=products,categories=categories,settings=settings_row(db),content=content_rows(db))
 
 @app.post("/api/orders")
 def create_order():
@@ -244,6 +259,27 @@ def update_settings():
     if "promotion_description" in fields:fields["promotion_description"]=str(fields["promotion_description"]).strip() or None
     if not fields:return fail("No settings to save.")
     with connect() as db:db.execute("UPDATE business_settings SET "+", ".join(f"{k}=?" for k in fields)+" WHERE id=1",tuple(fields.values()))
+    return jsonify(ok=True)
+
+@app.get("/api/admin/content")
+@admin_required
+def get_site_content():
+    with connect() as db:return jsonify(content_rows(db))
+
+@app.put("/api/admin/content")
+@admin_required
+def update_site_content():
+    data=body(); updates={key:str(value).strip() for key,value in data.items() if key in DEFAULT_CONTENT}
+    if not updates:return fail("Choose at least one website field to save.")
+    for key,value in updates.items():
+        if len(value)>2000:return fail(f"{key.replace('_',' ').title()} must be 2,000 characters or fewer.")
+        if key.endswith(("image","logo")) and value and not (value.startswith("/") or value.startswith("https://") or value.startswith("http://")):
+            return fail(f"{key.replace('_',' ').title()} must be a relative path or an HTTP(S) URL.")
+    for key in ("map_embed_url","map_link_url"):
+        if key in updates and updates[key] and not updates[key].startswith(("https://","http://")):
+            return fail(f"{key.replace('_',' ').title()} must be an HTTP(S) URL.")
+    with connect() as db:
+        db.executemany("INSERT INTO site_content(content_key,content_value) VALUES(?,?) ON CONFLICT(content_key) DO UPDATE SET content_value=excluded.content_value",updates.items())
     return jsonify(ok=True)
 
 init_db()

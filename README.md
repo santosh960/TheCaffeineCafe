@@ -26,7 +26,7 @@ Open <http://127.0.0.1:5000>. On first start, the app creates `instance/cafe.sql
 - Responsive cafe homepage, menu search and category filters, about and contact pages.
 - Shopping bag saved in the browser, with server-side order validation and pricing.
 - Order tracking by order number and matching phone number.
-- Staff sign-in, recent order management, menu and category editing, and cafe settings.
+- Staff sign-in, recent order management, menu and category editing, business settings, and a Website content editor for page copy, logo, photos, and map links. Open `/#admin` to sign in.
 - Checkout stays unavailable until pickup or delivery is enabled in Business settings. No online payment is collected.
 
 ## Configuration and deployment

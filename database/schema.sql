@@ -42,6 +42,11 @@ CREATE TABLE IF NOT EXISTS business_settings (
   rating_verified INTEGER NOT NULL DEFAULT 0 CHECK (rating_verified IN (0, 1))
 );
 
+CREATE TABLE IF NOT EXISTS site_content (
+  content_key TEXT PRIMARY KEY,
+  content_value TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS orders (
   id TEXT PRIMARY KEY,
   order_number TEXT NOT NULL UNIQUE,
