@@ -8,7 +8,7 @@ const money = value => `₹${Number(value || 0).toLocaleString('en-IN')}`;
 async function api(url, options={}) { const response = await fetch(url, { headers:{'Content-Type':'application/json', ...(options.headers||{})}, credentials:'same-origin', ...options }); const data = await response.json().catch(()=>({})); if (!response.ok) throw new Error(data.error || 'Something went wrong. Please try again.'); return data; }
 function toast(message) { const el=$('#toast'); el.textContent=message; el.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove('show'),2600); }
 function photo(product) { return product.photo_url || `/images/menu/${photos[product.name.toLowerCase()] || 'hot-coffee.jpg'}`; }
-function setPage(page) { state.page=page; if(location.hash !== `#${page}`) location.hash=page; window.scrollTo({top:0,behavior:'smooth'}); render(); }
+function setPage(page) { state.page=page; if(location.hash !== `#${page}`) location.hash=page; window.scrollTo({top:0,behavior:'smooth'}); $('#mobile-nav').classList.remove('open'); render(); }
 function cartCount(){ return Object.values(state.cart).reduce((sum,n)=>sum+n,0); }
 function saveCart(){ localStorage.setItem('tcc-cart',JSON.stringify(state.cart)); $('#cart-count').textContent=cartCount(); }
 const sectionHead = (eyebrow,title,text='',action='') => `<div class="section-heading"><div><span class="eyebrow">${eyebrow}</span><h2 class="serif">${title}</h2>${text?`<p>${text}</p>`:''}</div>${action?`<a class="text-link" href="#menu">${action} →</a>`:''}</div>`;
@@ -36,6 +36,7 @@ document.addEventListener('click',async e=>{const link=e.target.closest('a[href^
  if(e.target.closest('#cart-open'))openCart(); if(e.target.closest('[data-close]')||e.target.id==='cart-overlay')$('#modal-root').innerHTML='';
  if(e.target.closest('#clear-cart')){state.cart={};saveCart();openCart();}
  if(e.target.closest('#confirm-done')){$('#modal-root').innerHTML='';state.cart={};saveCart();setPage('track');}
+ if(e.target.closest('#nav-toggle')){const n=$('#mobile-nav');n.classList.toggle('open');e.target.setAttribute('aria-expanded',n.classList.contains('open'));}
  const tab=e.target.closest('[data-tab]');if(tab){document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===tab));$('#admin-panel').innerHTML=tab.dataset.tab==='orders'?ordersPanel(state.orders):tab.dataset.tab==='menu'?menuAdminPanel():settingsPanel();}
  if(e.target.closest('#logout')){try{await api('/api/admin/logout',{method:'POST'});}catch{}state.admin=false;render();}
 });
